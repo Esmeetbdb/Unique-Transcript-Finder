@@ -25,71 +25,7 @@ def query_db(args):
 
 	qdb.annotate_counts(db_dict, tmap_dict, args.patient_gtf, args.out_prefix, args.target_dir)
 	
-def stats_db(args):
-	import count_transcripts as ct
-	import get_statistics as gs
-
-
-	transcript_counts,transcript_info = ct.count_transcripts(args.out_prefix, args.target_dir)
-	tpm_dict_rare, fpkm_dict_rare, len_dict_rare, cov_dict_rare, exon_dict_rare = ct.extract_info(transcript_info, args.rare_threshold, False)
-
-	rare_tpm_avg_list, rare_tpm_avg_dict, rare_tpm_std_list = gs.get_avg_per_transcript(tpm_dict_rare)
-	gs.print_stats_to_file(args.target_dir+'rare_tpm_info.csv',rare_tpm_avg_dict)
-
-	rare_fpkm_avg_list, rare_fpkm_avg_dict, rare_fpkm_std_list = gs.get_avg_per_transcript(fpkm_dict_rare)
-	gs.print_stats_to_file(args.target_dir+'rare_fpkm_info.csv',rare_fpkm_avg_dict)
-
-
-	rare_len_avg_list, rare_len_avg_dict, rare_len_std_list = gs.get_avg_per_transcript(len_dict_rare)
-	gs.print_stats_to_file(args.target_dir+'rare_len_info.csv',rare_len_avg_dict)
-
-
-	rare_cov_avg_list, rare_cov_avg_dict, rare_cov_std_list = gs.get_avg_per_transcript(cov_dict_rare)
-	gs.print_stats_to_file(args.target_dir+'rare_cov_info.csv',rare_cov_avg_dict)
-
-
-	rare_exon_avg_list, rare_exon_avg_dict, rare_exon_std_list = gs.get_avg_per_transcript(exon_dict_rare)
-	gs.print_stats_to_file(args.target_dir+'rare_exon_info.csv',rare_exon_avg_dict)
-
-	
-	tpm_dict_common, fpkm_dict_common, len_dict_common, cov_dict_common, exon_dict_common = ct.extract_info(transcript_info, args.common_threshold, True)
-	
-	common_tpm_avg_list, common_tpm_avg_dict, common_tpm_std_list = gs.get_avg_per_transcript(tpm_dict_common)
-	gs.print_stats_to_file(args.target_dir+'common_tpm_info.csv',common_tpm_avg_dict)
-
-	common_fpkm_avg_list, common_fpkm_avg_dict, common_fpkm_std_list = gs.get_avg_per_transcript(fpkm_dict_common)
-	gs.print_stats_to_file(args.target_dir+'common_fpkm_info.csv',common_fpkm_avg_dict)
-
-	common_len_avg_list, common_len_avg_dict, common_len_std_list = gs.get_avg_per_transcript(len_dict_common)
-	gs.print_stats_to_file(args.target_dir+'common_len_info.csv',common_len_avg_dict)
-	
-	common_cov_avg_list, common_cov_avg_dict, common_cov_std_list = gs.get_avg_per_transcript(cov_dict_common)
-	gs.print_stats_to_file(args.target_dir+'common_cov_info.csv',common_cov_avg_dict)
-
-	common_exon_avg_list, common_exon_avg_dict, common_exon_std_list = gs.get_avg_per_transcript(exon_dict_common)
-	gs.print_stats_to_file(args.target_dir+'common_exon_info.csv',common_exon_avg_dict)
-
-
-	#t-tests
-	stat_tpm, p_tpm, mean_rare_tpm, mean_common_tpm = gs.t_test(rare_tpm_avg_list, common_tpm_avg_list)
-	stats_fpkm, p_fpkm,  mean_rare_fpkm, mean_common_fpkm = gs.t_test(rare_fpkm_avg_list, common_fpkm_avg_list)
-	stats_len, p_len,  mean_rare_len, mean_common_len = gs.t_test(rare_len_avg_list, common_len_avg_list)
-	stats_cov, p_cov,  mean_rare_cov, mean_common_cov = gs.t_test(rare_cov_avg_list, common_cov_avg_list)
-	stats_exon, p_exon, mean_rare_exon, mean_common_exon = gs.t_test(rare_exon_avg_list, common_exon_avg_list)
-
-	with open(args.out_prefix+'_statistics.csv', 'w') as file:
-		file.writelines('Compared, Statistic, P-value, MeanRare, MeanCommon\n')
-		file.writelines('TPM, {}, {}, {}, {}\n'.format(stat_tpm, p_tpm, mean_rare_tpm, mean_common_tpm))
-		file.writelines('FPKM, {}, {}, {}, {}\n'.format(stats_fpkm, p_fpkm, mean_rare_fpkm, mean_common_fpkm))
-		file.writelines('Length, {}, {}, {}, {}\n'.format(stats_len, p_len, mean_rare_len, mean_common_len))
-		file.writelines('Coverage, {}, {}, {}, {}\n'.format(stats_cov, p_cov, mean_rare_cov, mean_common_cov))
-		file.writelines('Exon_number, {}, {}, {}, {}\n'.format(stats_exon, p_exon, mean_rare_exon, mean_common_exon))
-
-
-def filter_query(args):
-	import filter_new as f
-	query_dict = f.make_dict(args.output_folder, args.query_file)
-	f.filter_dict(query_dict, args.max_count, args.max_frequency, args.min_cov, args.min_tpm, args.min_fpkm, args.annotated, args.output_folder, args.query_file)
+def find_unique(args):
 
 def main():
 	
@@ -120,24 +56,16 @@ def main():
 	parser_build.add_argument("--target_dir",type=str, default = "", help="Path where output files should be stored. Must end with \. If left empty files will be created in the current directory.")
 	parser_query.add_argument("--out_prefix", type=str, default = "query", help = "path to the GTF file with patient transcript information")
 	parser_query.set_defaults(func=query_db)
-	
-	parser_statistics = subparsers.add_parser("statistics", help = "help statistics")
-	parser_statistics.add_argument("rare_threshold",type=int, help = "The max number of times a transcript can be found in the database for it to be considered a rare transcript")
-	parser_statistics.add_argument("common_threshold",type=int, help = "The min number of times a transcript must be found in the database for it to be considered a common transcript")
-	parser_statistics.add_argument("--out_prefix","-O",type=str, default = "transcript_database", help="Outprefix used in the database build step.")
-	parser_statistics.add_argument("--target_dir",type=str, default = "", help="Path to the folder that contains all files created during database building. If left empty the current folder is taken as the correct one")
-	parser_statistics.set_defaults(func=stats_db)
 
-	parser_filter = subparsers.add_parser("filter", help = "help filter")
-	parser_filter.add_argument("query_file", type=str, help = "the gtf file that should be filtered. Created in the query step.")
-	parser_filter.add_argument("--max_count", type = int, default = 1, help = "The max number of times a transcript can be found in the database to pass the filter.")
-	parser_filter.add_argument("--max_frequency", type=float, default = 1.0, help = "The max frequecy at which a transcript can be included in the database to pass the filter. If this is changed it is adviced to set max_count arbitrarily high so that the count does not influence filtering.")
-	parser_filter.add_argument("--min_cov",type=float, default = 0.0, help = "The min coverage a transcript should have to pass the filter")
-	parser_filter.add_argument("--min_tpm", type = float, default = 0.0, help = "The min tpm a transcript should have to pass the filter")
-	parser_filter.add_argument("--min_fpkm", type = float, default = 0.0, help = "The min fpkm a transcript should have to pass the filter")
-	parser_filter.add_argument("--annotated", type = bool, default = True, help = "If True, only transcript that are annotated in the reference genome pass the filter,")
-	parser_filter.add_argument("--output_folder", type=str, default = "", help="Path where output files should be stored. Must end with \. If left empty files will be created in the current directory.")
-	parser_filter.set_defaults(func=filter_query)
+	gene_list, gtf, max_count, prefix
+	parser_unique = subparsers.add_parser("unique", help = "help unique")
+	parser_unique.add_argument("gene_list", type=str, help = "path to the file that contains genes of interest")
+	parser_unique.add_argument("patient_gtf", type=str, help = "path to the GTF file with patient transcript information")
+	parser_unique.add_argument("max_count", type=int, help = "Max number of times a transcript can be found to be considered unique")
+	parser_unique.add_argument("prefix", type=str, help="prefox for the output file that will contain the StringTie IDs of the unique transcripts")
+
+
+	parser_unique.set_defaults(func=find_unique)
 
 	args = parser.parse_args(sys.argv[1:])
 	args.func(args)

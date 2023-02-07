@@ -17,6 +17,12 @@ def get_unique_STRGid(STRGid, gtf, max_count):
 
     return unique
 
+def get_gene_list(gene_list_file):
+    gene_list = []
+    for line in open(gene_list_file):
+        gene_list.append(line.strip())
+    return gene_list
+
 def get_all_unique(gene_list, gtf, max_count, prefix):
     with open('{}_unique.txt'.format(prefix), 'w') as file:
         for gene in gene_list:
