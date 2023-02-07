@@ -26,6 +26,10 @@ def query_db(args):
 	qdb.annotate_counts(db_dict, tmap_dict, args.patient_gtf, args.out_prefix, args.target_dir)
 	
 def find_unique(args):
+	import Find_unique as fu
+	
+	gene_list = fu.get_gene_list(args.gene_list)
+	fu.get_all_unique(gene_list, args.patient_gtf,args.max_count, args.prefix)
 
 def main():
 	
