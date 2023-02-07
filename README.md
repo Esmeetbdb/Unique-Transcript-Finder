@@ -49,44 +49,17 @@ For more information about running this command use
  python __main__.py query --help 
  ```
  
- ## Step 3: Filtering the annotated transcript files
+ ## Step 3: Finding unique transcripts on the basis of a gene list
  
  The command to query the database is:
 ```
-__main__.py filter <annotated gff file> [--optional_arguments]
+__main__.py unique <gene list> <gtf> <max count> <prefix>
 ```
 
-Optional parameters are:
-Optional argument | Function | Default
----|---|---
---max_count | The max number of times a transcript can be found in the database to pass the filter. | 1
---max_frequency | The max frequecy at which a transcript can be included in the database to pass the filter. If this is changed it is adviced to set max_count arbitrarily high so that the count does not influence filtering| 1.0
---min_cov |The min coverage a transcript should have to pass the filter | 0.0
---min_fpkm | The min FPKM a transcript should have to pass the filter | 0.0
---min_tpm | The min TPM a transcript should have to pass the filter | 0.0
---annotated | If True, only transcript that are annotated in the reference genome pass the filter | True
---output_folder | Path where output files should be stored. Must end with \. If left empty files will be created in the current folder | 
 
 For more information about running this command use
  ```
- python __main__.py filter --help 
- ```
- 
- ## Extra option: statistics
- To obtain extra information about the database and transcripts in it run:
- ```
-__main__.py statistics <rare threshold> <common_threshold> [--optional_arguments]
-```
-
-Optional parameters are:
-Optional argument | Function | Default
----|---|---
---out_prefix | The outprefix used in step 1 | transcript_database
---target_folder | Path to the folder where all files were created during database building. Must end with \. If left empty files will be created in the current folder | 
-
-For more information about running this command use
- ```
- python __main__.py statistics --help 
+ python __main__.py unique --help 
  ```
  
  
