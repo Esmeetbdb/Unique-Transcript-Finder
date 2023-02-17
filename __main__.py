@@ -61,7 +61,6 @@ def main():
 	parser_query.add_argument("--out_prefix", type=str, default = "query", help = "path to the GTF file with patient transcript information")
 	parser_query.set_defaults(func=query_db)
 
-	gene_list, gtf, max_count, prefix
 	parser_unique = subparsers.add_parser("unique", help = "help unique")
 	parser_unique.add_argument("gene_list", type=str, help = "path to the file that contains genes of interest")
 	parser_unique.add_argument("patient_gtf", type=str, help = "path to the GTF file with patient transcript information")
